@@ -6,7 +6,7 @@
 
 | Package | Version | Description |
 |---------|---------|-------------|
-| Django | 5.2.10 | Framework web Python |
+| Django | 6.0.1 | Framework web Python |
 | psycopg2-binary | 2.9.11 | Driver PostgreSQL |
 | gunicorn | 23.0.0 | Serveur WSGI Python |
 | whitenoise | 6.11.0 | Serveur fichiers statiques |
@@ -56,15 +56,17 @@ pip list
 pip list --outdated
 ```
 
-## Compatibilité Django 5.2
+## Compatibilité Django 6.0
 
-Django 5.2 introduit :
-- Support Python 3.10, 3.11, 3.12, 3.13
-- Améliorations de performance
+Django 6.0 (sorti le 3 décembre 2025) introduit :
+- **Support Python 3.12, 3.13, 3.14** (abandon 3.10, 3.11)
+- **Background tasks natif** : Gestion des tâches asynchrones intégrée
+- **Content Security Policy native** : Sécurité renforcée
+- Améliorations de performance significatives
 - Nouvelles fonctionnalités ORM
-- Améliorations sécurité
+- Async views et middleware améliorés
 
-Voir : https://docs.djangoproject.com/en/5.2/releases/5.2/
+Voir : https://docs.djangoproject.com/en/6.0/releases/6.0/
 
 ## Notes
 

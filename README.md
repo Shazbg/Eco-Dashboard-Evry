@@ -8,7 +8,7 @@ Cette application Django permet aux différents services de la mairie de saisir 
 
 ## 🛠️ Stack Technique
 
-- **Backend** : Django 5.0.1
+- **Backend** : Django 6.0.1
 - **Base de données** : PostgreSQL 15+
 - **Frontend** : Django Templates + Vanilla CSS + JavaScript ES6
 - **Serveur** : Gunicorn + Nginx (production)
