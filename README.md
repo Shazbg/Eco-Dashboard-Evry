@@ -105,11 +105,7 @@ pytest --cov=apps
 
 Projet interne - Mairie d'Évry-Courcouronnes
 
-## 👥 Contact
-
-Centre de Ressources GES - ADEME  
-Email : centrederessourcesges@ademe.fr
-
 ---
 
 **Éco-conçu avec ❤️ pour la transition écologique**
+
