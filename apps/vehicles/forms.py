@@ -12,9 +12,9 @@ class VehicleFuelForm(forms.ModelForm):
         widgets = {
             'year': forms.NumberInput(attrs={
                 'class': 'form-input',
-                'placeholder': '2024',
+                'placeholder': '2026',
                 'min': '2020',
-                'max': '2030'
+                'max': '2040'
             }),
             'service': forms.TextInput(attrs={
                 'class': 'form-input',
@@ -84,9 +84,9 @@ class VehicleDistanceForm(forms.ModelForm):
         widgets = {
             'year': forms.NumberInput(attrs={
                 'class': 'form-input',
-                'placeholder': '2024',
+                'placeholder': '2026',
                 'min': '2020',
-                'max': '2030'
+                'max': '2040'
             }),
             'service': forms.TextInput(attrs={
                 'class': 'form-input',

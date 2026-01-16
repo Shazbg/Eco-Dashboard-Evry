@@ -1,6 +1,9 @@
 # Fichiers temporaires Excel
 ~$*.xlsx
 
+# Excel
+*.xlsx
+
 # Python
 __pycache__/
 *.py[cod]

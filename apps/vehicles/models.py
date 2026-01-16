@@ -86,7 +86,7 @@ class VehicleData(models.Model):
         verbose_name="Utilisateur"
     )
     year = models.IntegerField(
-        default=2024,
+        default=2026,
         verbose_name="Année"
     )
     service = models.CharField(
