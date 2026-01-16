@@ -27,7 +27,7 @@
 
 ## Environnement
 
-- **Python** : 3.10+ (testé avec 3.10.13)
+- **Python** : 3.12+ (testé avec 3.12.11)
 - **PostgreSQL** : 15+ recommandé
 - **OS** : macOS, Linux, Windows
 

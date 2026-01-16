@@ -17,7 +17,7 @@ Cette application Django permet aux différents services de la mairie de saisir 
 
 ### Prérequis
 
-- Python 3.10+
+- Python 3.12+
 - PostgreSQL 15+
 - Git
 
