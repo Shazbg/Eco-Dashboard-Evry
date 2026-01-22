@@ -16,26 +16,38 @@ logger = logging.getLogger(__name__)
 class ADEMECSVParser:
     """
     Parser pour le fichier CSV ADEME Base Carbone.
-    Télécharge et extrait les facteurs d'émission pertinents pour chaque secteur.
+    Télécharge et extrait UNIQUEMENT les facteurs d'émission essentiels.
     """
     
-    # Mapping des secteurs vers les mots-clés et catégories ADEME
-    SECTOR_MAPPING = {
+    # Facteurs essentiels à extraire (liste blanche ultra-stricte)
+    # Basé sur les noms exacts de la Base Carbone ADEME
+    ESSENTIAL_FACTORS = {
         'vehicles': {
-            'keywords': ['essence', 'sp95', 'sp98', 'gazole', 'diesel', 'voiture', 'véhicule'],
-            'categories': ['Transport routier', 'Transports']
-        },
-        'buildings': {
-            'keywords': ['électricité', 'gaz naturel', 'chauffage', 'fioul', 'climatisation'],
-            'categories': ['Energie', 'Chauffage urbain']
-        },
-        'food': {
-            'keywords': ['viande', 'poisson', 'légumes', 'fruits', 'pain', 'lait', 'fromage'],
-            'categories': ['Alimentation']
-        },
-        'purchases': {
-            'keywords': ['papier', 'carton', 'mobilier', 'ordinateur', 'textile', 'fourniture'],
-            'categories': ['Produits', 'Services']
+            'essence_sp95_sp98': {
+                'all_keywords': ['essence', 'pompe'],  # "Essence à la pompe"
+                'exclude': ['bio', 'france métropolitaine'],
+                'unit': 'litre',
+                'max_results': 1
+            },
+            'gazole_routier': {
+                'all_keywords': ['gazole'],  # "Gazole routier" ou "Gazole non routier"
+                'exclude': ['bio', 'france métropolitaine'],  
+                'unit': 'litre',
+                'max_results': 2  # Routier + non routier
+            },
+            'voiture_thermique_km': {
+                'all_keywords': ['voiture', 'particulière'],
+                'exclude': ['électrique', 'hybride', 'france'],
+                'any_of': ['thermique', 'moyenne'],  # Au moins un de ceux-ci
+                'unit': 'km',
+                'max_results': 1
+            },
+            'voiture_electrique_km': {
+                'all_keywords': ['voiture', 'électrique'],
+                'exclude': ['hybride', 'france'],
+                'unit': 'km',
+                'max_results': 1
+            }
         }
     }
     
@@ -88,7 +100,7 @@ class ADEMECSVParser:
     
     def parse_csv(self, csv_content: str, sectors: Optional[List[str]] = None) -> Dict[str, List[Dict]]:
         """
-        Parse le contenu CSV et extrait les facteurs par secteur.
+        Parse le contenu CSV et extrait UNIQUEMENT les facteurs essentiels par secteur.
         
         Args:
             csv_content: Contenu du CSV
@@ -98,11 +110,14 @@ class ADEMECSVParser:
             Dictionnaire {secteur: [facteurs]}
         """
         if sectors is None:
-            sectors = list(self.SECTOR_MAPPING.keys())
+            sectors = list(self.ESSENTIAL_FACTORS.keys())
         
         logger.info(f"Parsing CSV pour secteurs: {sectors}")
         
         result = {sector: [] for sector in sectors}
+        
+        # Tracker pour limiter le nombre de résultats par facteur
+        found_counts = {sector: {} for sector in sectors}
         
         # Parser le CSV
         csv_reader = csv.DictReader(StringIO(csv_content), delimiter=';')
@@ -115,12 +130,21 @@ class ADEMECSVParser:
             
             # Affecter au bon secteur
             for sector in sectors:
-                if self._matches_sector(factor_data, sector):
-                    result[sector].append(factor_data)
+                match_result = self._matches_sector(factor_data, sector)
+                if match_result:
+                    factor_key, max_results = match_result
+                    
+                    # Vérifier si on a déjà atteint le max pour ce facteur
+                    current_count = found_counts[sector].get(factor_key, 0)
+                    if current_count < max_results:
+                        result[sector].append(factor_data)
+                        found_counts[sector][factor_key] = current_count + 1
         
         # Logging
         for sector, factors in result.items():
             logger.info(f"Secteur '{sector}': {len(factors)} facteurs trouvés")
+            for factor_key, count in found_counts.get(sector, {}).items():
+                logger.info(f"  - {factor_key}: {count} facteur(s)")
         
         return result
     
@@ -177,35 +201,55 @@ class ADEMECSVParser:
             logger.debug(f"Erreur extraction ligne: {e}")
             return None
     
-    def _matches_sector(self, factor_data: Dict, sector: str) -> bool:
+    def _matches_sector(self, factor_data: Dict, sector: str):
         """
-        Vérifie si un facteur correspond à un secteur donné.
+        Vérifie si un facteur correspond STRICTEMENT aux facteurs essentiels du secteur.
         
         Args:
             factor_data: Données du facteur
             sector: Nom du secteur
             
         Returns:
-            True si le facteur correspond au secteur
+            Tuple (factor_key, max_results) si match, None sinon
         """
-        mapping = self.SECTOR_MAPPING.get(sector)
-        if not mapping:
-            return False
+        if sector not in self.ESSENTIAL_FACTORS:
+            return None
         
         name_lower = factor_data['name'].lower()
-        category_lower = factor_data.get('category', '').lower()
+        unit_lower = factor_data['unit'].lower()
         
-        # Vérifier les mots-clés
-        for keyword in mapping['keywords']:
-            if keyword.lower() in name_lower:
-                return True
+        # Vérifier chaque facteur essentiel
+        for factor_key, criteria in self.ESSENTIAL_FACTORS[sector].items():
+            # Vérifier l'unité
+            if criteria['unit'] not in unit_lower:
+                continue
+            
+            # Vérifier que TOUS les mots-clés sont présents
+            all_keywords_present = all(
+                kw.lower() in name_lower for kw in criteria['all_keywords']
+            )
+            if not all_keywords_present:
+                continue
+            
+            # Vérifier any_of si spécifié (au moins un doit être présent)
+            if 'any_of' in criteria:
+                any_of_present = any(
+                    kw.lower() in name_lower for kw in criteria['any_of']
+                )
+                if not any_of_present:
+                    continue
+            
+            # Vérifier les exclusions
+            has_exclusion = any(
+                excl.lower() in name_lower for excl in criteria['exclude']
+            )
+            if has_exclusion:
+                continue
+            
+            # Toutes les conditions sont remplies
+            return (factor_key, criteria['max_results'])
         
-        # Vérifier les catégories
-        for cat in mapping['categories']:
-            if cat.lower() in category_lower:
-                return True
-        
-        return False
+        return None
     
     def get_factors_for_sector(self, sector: str) -> List[Dict]:
         """
