@@ -15,7 +15,9 @@
     <header class="header">
         <div class="container">
             <div class="header__content">
-                <h1 class="header__title">🌱 Bilan Carbone - Évry</h1>
+                <a href="{% url 'dashboard' %}" class="header__title-link">
+                    <h1 class="header__title">🌱 Bilan Carbone - Évry</h1>
+                </a>
                 <div class="header__user">
                     <span class="header__user-name">👤 {{ user.get_full_name|default:user.username }}</span>
                     <a href="{% url 'logout' %}" class="header__logout">Déconnexion</a>
