@@ -85,7 +85,7 @@
             </div>
         </div>
 
-        <div class="module-card module-card--disabled">
+        <div class="module-card">
             <div class="module-card__header">
                 <span class="module-card__icon">🍽️</span>
                 <h3 class="module-card__title">Alimentation</h3>
@@ -94,7 +94,15 @@
                 Impact carbone de la restauration collective
             </p>
             <div class="module-card__stats">
-                <span class="module-card__badge module-card__badge--disabled">À venir</span>
+                <span class="module-card__badge module-card__badge--info">Disponible</span>
+            </div>
+            <div class="module-card__actions">
+                <a href="{% url 'food_form' %}" class="btn btn--primary">
+                    📝 Saisir des données
+                </a>
+                <a href="{% url 'food_list' %}" class="btn btn--secondary">
+                    👁️ Voir les données
+                </a>
             </div>
         </div>
 

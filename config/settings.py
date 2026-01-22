@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'apps.core',
     'apps.vehicles',
     'apps.purchases',
+    'apps.alimentation',
 ]
 
 MIDDLEWARE = [
