@@ -5,4 +5,5 @@ urlpatterns = [
     path('login/', views.login_view, name='login'),
     path('logout/', views.logout_view, name='logout'),
     path('', views.dashboard_view, name='dashboard'),
+    path('send-reminder/', views.send_reminder_email, name='send_reminder'),
 ]

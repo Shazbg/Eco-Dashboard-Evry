@@ -1,0 +1,20 @@
+Bonjour {{ user.get_full_name|default:user.username }},
+
+C'est le moment de saisir vos données pour le bilan carbone {{ year }} de la Mairie d'Évry-Courcouronnes.
+
+📊 Accédez au tableau de bord :
+https://{{ domain }}/
+
+Merci de saisir vos consommations énergétiques et déplacements professionnels dans les meilleurs délais.
+
+Modules disponibles :
+- 🚗 Véhicules : consommation de carburant et kilométrage
+- 🏢 Bâtiments : à venir
+- 🍽️ Alimentation : à venir
+- 🛒 Achats : à venir
+
+En cas de questions, n'hésitez pas à contacter le service environnement.
+
+Cordialement,
+L'équipe Bilan Carbone
+Mairie d'Évry-Courcouronnes

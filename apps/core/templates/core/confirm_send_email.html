@@ -1,0 +1,196 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Confirmation - Envoi Email{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="confirm-card">
+        <div class="confirm-header">
+            <div class="confirm-icon">📧</div>
+            <h2 class="confirm-title">Envoyer un rappel de saisie</h2>
+        </div>
+
+        <div class="confirm-content">
+            <p class="confirm-message">
+                Vous êtes sur le point d'envoyer un email de rappel à tous les agents de la mairie.
+            </p>
+
+            <div class="info-box">
+                <h3>📊 Destinataires</h3>
+                <p class="recipients-count">
+                    <strong>{{ recipients_count }}</strong> agent(s) recevront cet email
+                </p>
+            </div>
+
+            <div class="email-preview">
+                <h3>✉️ Aperçu du message</h3>
+                <div class="preview-content">
+                    <p><strong>Sujet :</strong> Rappel - Saisie du bilan carbone {{ current_year }}</p>
+                    <div class="preview-body">
+                        <p>Bonjour [Nom de l'agent],</p>
+                        <p>C'est le moment de saisir vos données pour le bilan carbone {{ current_year }} de la Mairie d'Évry-Courcouronnes.</p>
+                        <p>📊 Accédez au tableau de bord : [lien]</p>
+                        <p>Merci de saisir vos consommations énergétiques et déplacements professionnels dans les meilleurs délais.</p>
+                        <p>Cordialement,<br>L'équipe Bilan Carbone</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="warning-box">
+                <strong>⚠️ Attention</strong>
+                <p>Cet email sera envoyé immédiatement à tous les agents actifs.</p>
+            </div>
+        </div>
+
+        <div class="confirm-actions">
+            <form method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn btn--primary btn--large">
+                    ✅ Confirmer et envoyer
+                </button>
+                <a href="{% url 'dashboard' %}" class="btn btn--secondary">
+                    Annuler
+                </a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.confirm-card {
+    max-width: 700px;
+    margin: 3rem auto;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.confirm-header {
+    background: linear-gradient(135deg, #4A90E2 0%, #357ABD 100%);
+    color: white;
+    padding: 2rem;
+    text-align: center;
+}
+
+.confirm-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+}
+
+.confirm-title {
+    margin: 0;
+    font-size: 1.5rem;
+}
+
+.confirm-content {
+    padding: 2rem;
+}
+
+.confirm-message {
+    font-size: 1.125rem;
+    color: var(--text-dark);
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.info-box {
+    background: #E3F2FD;
+    border-left: 4px solid #2196F3;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    border-radius: 4px;
+}
+
+.info-box h3 {
+    color: #1976D2;
+    margin-bottom: 0.5rem;
+    font-size: 1rem;
+}
+
+.recipients-count {
+    font-size: 1.25rem;
+    margin: 0;
+}
+
+.email-preview {
+    background: var(--bg-main);
+    padding: 1.5rem;
+    border-radius: 6px;
+    margin-bottom: 1.5rem;
+}
+
+.email-preview h3 {
+    color: var(--primary);
+    margin-bottom: 1rem;
+    font-size: 1rem;
+}
+
+.preview-content {
+    background: white;
+    padding: 1rem;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+}
+
+.preview-content strong {
+    color: var(--primary);
+}
+
+.preview-body {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+    font-size: 0.9rem;
+    line-height: 1.6;
+}
+
+.warning-box {
+    background: #FFF3E0;
+    border: 1px solid #FFB74D;
+    border-radius: 4px;
+    padding: 1rem;
+    color: #E65100;
+}
+
+.warning-box strong {
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+.warning-box p {
+    margin: 0;
+    font-size: 0.9rem;
+}
+
+.confirm-actions {
+    padding: 1.5rem 2rem;
+    background: var(--bg-main);
+    border-top: 1px solid var(--border);
+}
+
+.confirm-actions form {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+}
+
+.btn--large {
+    padding: 1rem 2rem;
+    font-size: 1.05rem;
+}
+
+@media (max-width: 768px) {
+    .confirm-card {
+        margin: 2rem 1rem;
+    }
+    
+    .confirm-actions form {
+        flex-direction: column;
+    }
+}
+</style>
+{% endblock %}
