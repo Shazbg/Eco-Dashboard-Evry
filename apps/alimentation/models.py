@@ -73,6 +73,20 @@ class FoodEntry(models.Model):
         ordering = ["-year", "service"]
         unique_together = ("service", "year")
 
+    def __str__(self):
+        return f"{self.service} - {self.year} ({self.total_meals()} repas)"
+
+    def total_meals(self):
+        """Calcule le nombre total de repas."""
+        return (
+            self.beef_meals + 
+            self.pork_meals + 
+            self.poultry_fish_meals + 
+            self.vegetarian_meals + 
+            self.picnic_no_meat_meals + 
+            self.picnic_meat_meals
+        )
+
     def calculate_impact(self):
         factors = {f.code: f.kg_co2_per_meal for f in FoodEmissionFactor.objects.all()}
 
