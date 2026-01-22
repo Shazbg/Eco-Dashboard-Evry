@@ -65,9 +65,7 @@
                             entry.vegetarian_meals }}</span>{% endif %}
                     </td>
                     <td class="data-cell">
-                        {{
-                        entry.beef_meals|add:entry.pork_meals|add:entry.poultry_fish_meals|add:entry.vegetarian_meals|add:entry.picnic_meat_meals|add:entry.picnic_no_meat_meals
-                        }}
+                        {{ entry.total_meals }}
                     </td>
                     <td class="data-cell data-cell--highlight">
                         {{ entry.total_co2_kg|floatformat:2 }}
