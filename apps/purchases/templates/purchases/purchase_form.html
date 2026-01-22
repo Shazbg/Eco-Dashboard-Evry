@@ -1,69 +1,288 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Saisir un achat - Bilan Carbone{% endblock %}
+{% block title %}Saisie Données Achats - Bilan Carbone{% endblock %}
 
 {% block content %}
 <div class="container">
     <div class="page-header">
-        <h1 class="page-title">🛒 Saisie Achats & Marchés</h1>
-        <p class="page-subtitle">Enregistrez vos dépenses et calcul automatique du CO₂</p>
+        <h2 class="page-title">🛒 Saisie Données Achats & Marchés</h2>
+        <a href="{% url 'purchase_list' %}" class="btn btn--secondary">
+            ← Retour à la liste
+        </a>
     </div>
 
-    <form method="post" class="data-form">
-        {% csrf_token %}
-        
-        <div class="form-section">
-            <h3 class="section-title">📋 Informations générales</h3>
-            
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="{{ form.year.id_for_label }}">Année</label>
-                    {{ form.year }}
+    <!-- Form card -->
+    <div class="form-card">
+        <div class="form-card__header">
+            <h3>📊 Enregistrement d'un achat ou marché</h3>
+            <p class="form-card__description">
+                Renseignez les informations sur les achats et marchés publics de votre service
+            </p>
+        </div>
+
+        <form method="post" class="purchase-form" id="purchaseForm">
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+            <div class="alert alert--error">
+                {{ form.non_field_errors }}
+            </div>
+            {% endif %}
+
+            {% for field in form %}
+            <div class="form-group {% if field.errors %}form-group--error{% endif %}">
+                <label for="{{ field.id_for_label }}" class="form-label">
+                    {{ field.label }}
+                    {% if field.field.required %}<span class="required">*</span>{% endif %}
+                </label>
+
+                {{ field }}
+
+                {% if field.help_text %}
+                <p class="form-help">
+                    <span class="form-help__icon">ℹ️</span>
+                    {{ field.help_text }}
+                </p>
+                {% endif %}
+
+                {% if field.errors %}
+                <div class="form-error">
+                    {{ field.errors }}
                 </div>
-                
-                <div class="form-group">
-                    <label for="{{ form.service.id_for_label }}">Service/Direction</label>
-                    {{ form.service }}
-                </div>
+                {% endif %}
             </div>
-        </div>
+            {% endfor %}
 
-        <div class="form-section">
-            <h3 class="section-title">💰 Détails de l'achat</h3>
-            
-            <div class="form-group">
-                <label for="{{ form.category.id_for_label }}">Catégorie d'achat *</label>
-                {{ form.category }}
-                <small class="form-help">Sélectionnez la catégorie correspondante</small>
+            <div class="form-actions">
+                <button type="submit" class="btn btn--primary btn--large">
+                    💾 Enregistrer
+                </button>
+                <a href="{% url 'purchase_list' %}" class="btn btn--secondary">
+                    Annuler
+                </a>
             </div>
-            
-            <div class="form-group">
-                <label for="{{ form.description.id_for_label }}">Description du marché *</label>
-                {{ form.description }}
-                <small class="form-help">Décrivez précisément le marché ou service</small>
-            </div>
-            
-            <div class="form-group">
-                <label for="{{ form.amount_euros.id_for_label }}">Montant (€) *</label>
-                {{ form.amount_euros }}
-                <small class="form-help">Montant total dépensé en euros</small>
-            </div>
-        </div>
+        </form>
+    </div>
 
-        <div class="form-section">
-            <h3 class="section-title">📝 Notes (optionnel)</h3>
-            
-            <div class="form-group">
-                <label for="{{ form.notes.id_for_label }}">Commentaires</label>
-                {{ form.notes }}
-            </div>
-        </div>
-
-        <div class="form-actions">
-            <button type="submit" class="btn btn--primary">💾 Enregistrer</button>
-            <a href="{% url 'purchase_list' %}" class="btn btn--secondary">Annuler</a>
-        </div>
-    </form>
+    <!-- Info section -->
+    <div class="info-box">
+        <h4>📖 Facteurs d'émission utilisés (source: Excel Achats 30%)</h4>
+        <table class="factors-table">
+            <thead>
+                <tr>
+                    <th>Catégorie</th>
+                    <th>Facteur</th>
+                    <th>Unité</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Restauration & Services légers</td>
+                    <td>100</td>
+                    <td>kg CO₂e/k€</td>
+                </tr>
+                <tr>
+                    <td>Assurances & Cotisations</td>
+                    <td>110</td>
+                    <td>kg CO₂e/k€</td>
+                </tr>
+                <tr>
+                    <td>IT & Téléphonie</td>
+                    <td>160</td>
+                    <td>kg CO₂e/k€</td>
+                </tr>
+                <tr>
+                    <td>Nettoyage & Entretien & Espaces verts</td>
+                    <td>215</td>
+                    <td>kg CO₂e/k€</td>
+                </tr>
+                <tr>
+                    <td>Séjours & Activités</td>
+                    <td>270</td>
+                    <td>kg CO₂e/k€</td>
+                </tr>
+                <tr>
+                    <td>Blanchisserie</td>
+                   <td>320</td>
+                    <td>kg CO₂e/k€</td>
+                </tr>
+                <tr>
+                    <td>Travaux & Construction</td>
+                    <td>360</td>
+                    <td>kg CO₂e/k€</td>
+                </tr>
+                <tr>
+                    <td>Transports</td>
+                    <td>560</td>
+                    <td>kg CO₂e/k€</td>
+                </tr>
+                <tr>
+                    <td>Location équipements</td>
+                    <td>600</td>
+                    <td>kg CO₂e/k€</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 </div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid var(--border);
+    }
+
+    .page-title {
+        font-size: 1.75rem;
+        color: var(--primary);
+        margin: 0;
+    }
+
+    .form-card {
+        background: white;
+        padding: 2rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        margin-bottom: 2rem;
+    }
+
+    .form-card__header {
+        margin-bottom: 2rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .form-card__header h3 {
+        color: var(--primary);
+        margin-bottom: 0.5rem;
+    }
+
+    .form-card__description {
+        color: var(--text-light);
+        font-size: 0.9rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group--error .form-input,
+    .form-group--error .form-select,
+    .form-group--error .form-textarea {
+        border-color: #dc3545;
+    }
+
+    .required {
+        color: #dc3545;
+        margin-left: 0.25rem;
+    }
+
+    .form-help {
+        font-size: 0.875rem;
+        color: var(--text-light);
+        margin-top: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .form-help__icon {
+        font-size: 1rem;
+    }
+
+    .form-error {
+        color: #dc3545;
+        font-size: 0.875rem;
+        margin-top: 0.5rem;
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 1rem;
+        margin-top: 2rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid var(--border);
+    }
+
+    .btn--large {
+        padding: 1rem 2rem;
+        font-size: 1.05rem;
+    }
+
+    .info-box {
+        background: #f8f9fa;
+        padding: 1.5rem;
+        border-radius: 6px;
+        border-left: 4px solid var(--primary);
+    }
+
+    .info-box h4 {
+        color: var(--primary);
+        margin-bottom: 1rem;
+    }
+
+    .factors-table {
+        width: 100%;
+        border-collapse: collapse;
+        background: white;
+        border-radius: 4px;
+        overflow: hidden;
+    }
+
+    .factors-table th,
+    .factors-table td {
+        padding: 0.75rem;
+        text-align: left;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .factors-table th {
+        background: var(--bg-main);
+        font-weight: 600;
+        color: var(--text-dark);
+    }
+
+    .factors-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    .factors-table tbody tr:hover {
+        background: #f8f9fa;
+    }
+
+    .alert {
+        padding: 1rem;
+        border-radius: 4px;
+        margin-bottom: 1.5rem;
+    }
+
+    .alert--error {
+        background-color: #f8d7da;
+        border: 1px solid #f5c2c7;
+        color: #842029;
+    }
+
+    @media (max-width: 768px) {
+        .page-header {
+            flex-direction: column;
+            gap: 1rem;
+            align-items: flex-start;
+        }
+
+        .form-actions {
+            flex-direction: column;
+        }
+
+        .factors-table {
+            font-size: 0.875rem;
+        }
+    }
+</style>
 {% endblock %}
