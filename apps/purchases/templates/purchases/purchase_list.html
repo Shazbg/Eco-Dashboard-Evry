@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Mes achats - Bilan Carbone{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="page-header">
+        <h1 class="page-title">🛒 Mes Achats & Marchés</h1>
+        <a href="{% url 'purchase_form' %}" class="btn btn--primary">➕ Nouvel achat</a>
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="stats-summary">
+        <div class="stat-card">
+            <span class="stat-value">{{ purchase_count }}</span>
+            <span class="stat-label">achat(s) enregistré(s)</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-value">{{ total_amount|floatformat:2 }} €</span>
+            <span class="stat-label">montant total</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-value">{{ total_co2|floatformat:2 }} kg</span>
+            <span class="stat-label">CO₂ total</span>
+        </div>
+    </div>
+
+    {% if purchases %}
+        <div class="data-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Année</th>
+                        <th>Catégorie</th>
+                        <th>Description</th>
+                        <th>Montant</th>
+                        <th>CO₂</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for purchase in purchases %}
+                    <tr>
+                        <td>{{ purchase.year }}</td>
+                        <td><span class="badge">{{ purchase.get_category_display }}</span></td>
+                        <td>{{ purchase.description|truncatechars:60 }}</td>
+                        <td>{{ purchase.amount_euros|floatformat:2 }} €</td>
+                        <td><strong>{{ purchase.total_co2_kg|floatformat:2 }}</strong> kg CO₂e</td>
+                        <td class="actions">
+                            <a href="{% url 'purchase_detail' purchase.pk %}" class="btn-sm">👁️ Voir</a>
+                            <a href="{% url 'purchase_delete' purchase.pk %}" class="btn-sm btn-danger">🗑️</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <p>Aucun achat enregistré</p>
+            <a href="{% url 'purchase_form' %}" class="btn btn--primary">➕ Saisir le premier achat</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

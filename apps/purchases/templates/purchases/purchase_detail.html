@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Détail achat - Bilan Carbone{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="page-header">
+        <h1 class="page-title">🛒 Détail de l'achat</h1>
+        <a href="{% url 'purchase_list' %}" class="btn btn--secondary">← Retour à la liste</a>
+    </div>
+
+    <div class="detail-card">
+        <div class="detail-section">
+            <h3>📋 Informations générales</h3>
+            <dl>
+                <dt>Année</dt>
+                <dd>{{ purchase.year }}</dd>
+                
+                <dt>Service/Direction</dt>
+                <dd>{{ purchase.service|default:"Non renseigné" }}</dd>
+            </dl>
+        </div>
+
+        <div class="detail-section">
+            <h3>💰 Détails de l'achat</h3>
+            <dl>
+                <dt>Catégorie</dt>
+                <dd><span class="badge">{{ purchase.get_category_display }}</span></dd>
+                
+                <dt>Description</dt>
+                <dd>{{ purchase.description }}</dd>
+                
+                <dt>Montant</dt>
+                <dd><strong>{{ purchase.amount_euros|floatformat:2 }} €</strong></dd>
+                
+                <dt>Facteur d'émission</dt>
+                <dd>{{ purchase.emission_factor }} kgCO₂e/k€</dd>
+            </dl>
+        </div>
+
+        <div class="detail-section highlight">
+            <h3>🌍 Impact Carbone</h3>
+            <div class="co2-result">
+                <div class="co2-value">{{ purchase.total_co2_kg|floatformat:2 }} kg CO₂e</div>
+                <div class="co2-tons">≈ {{ purchase.total_co2_tons|floatformat:3 }} tonne(s) CO₂e</div>
+            </div>
+        </div>
+
+        {% if purchase.notes %}
+        <div class="detail-section">
+            <h3>📝 Notes</h3>
+            <p>{{ purchase.notes }}</p>
+        </div>
+        {% endif %}
+
+        <div class="detail-actions">
+            <a href="{% url 'purchase_delete' purchase.pk %}" class="btn btn--danger">🗑️ Supprimer</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

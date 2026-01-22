@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block title %}Supprimer achat - Bilan Carbone{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="confirm-delete">
+        <h2>Confirmer la suppression</h2>
+        <p>Êtes-vous sûr de vouloir supprimer cet achat ?</p>
+        
+        <div class="item-to-delete">
+            <strong>{{ purchase.get_category_display }}</strong><br>
+            {{ purchase.description }}<br>
+            Montant : {{ purchase.amount_euros }} € | CO₂ : {{ purchase.total_co2_kg|floatformat:2 }} kg
+        </div>
+
+        <form method="post">
+            {% csrf_token %}
+            <button type="submit" class="btn btn--danger">Oui, supprimer</button>
+            <a href="{% url 'purchase_list' %}" class="btn btn--secondary">Annuler</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Saisir un achat - Bilan Carbone{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="page-header">
+        <h1 class="page-title">🛒 Saisie Achats & Marchés</h1>
+        <p class="page-subtitle">Enregistrez vos dépenses et calcul automatique du CO₂</p>
+    </div>
+
+    <form method="post" class="data-form">
+        {% csrf_token %}
+        
+        <div class="form-section">
+            <h3 class="section-title">📋 Informations générales</h3>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="{{ form.year.id_for_label }}">Année</label>
+                    {{ form.year }}
+                </div>
+                
+                <div class="form-group">
+                    <label for="{{ form.service.id_for_label }}">Service/Direction</label>
+                    {{ form.service }}
+                </div>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <h3 class="section-title">💰 Détails de l'achat</h3>
+            
+            <div class="form-group">
+                <label for="{{ form.category.id_for_label }}">Catégorie d'achat *</label>
+                {{ form.category }}
+                <small class="form-help">Sélectionnez la catégorie correspondante</small>
+            </div>
+            
+            <div class="form-group">
+                <label for="{{ form.description.id_for_label }}">Description du marché *</label>
+                {{ form.description }}
+                <small class="form-help">Décrivez précisément le marché ou service</small>
+            </div>
+            
+            <div class="form-group">
+                <label for="{{ form.amount_euros.id_for_label }}">Montant (€) *</label>
+                {{ form.amount_euros }}
+                <small class="form-help">Montant total dépensé en euros</small>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <h3 class="section-title">📝 Notes (optionnel)</h3>
+            
+            <div class="form-group">
+                <label for="{{ form.notes.id_for_label }}">Commentaires</label>
+                {{ form.notes }}
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn--primary">💾 Enregistrer</button>
+            <a href="{% url 'purchase_list' %}" class="btn btn--secondary">Annuler</a>
+        </div>
+    </form>
+</div>
+{% endblock %}
