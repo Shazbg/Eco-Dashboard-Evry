@@ -1,0 +1,230 @@
+{% extends "base.html" %}
+
+{% block title %}Saisie Bâtiments - Bilan Carbone{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="page-header">
+    <a href="{% url 'dashboard' %}" class="btn btn--secondary" title="Tableau de bord">
+      🏠
+    </a>
+    <h2 class="page-title">🏢 Saisie Bâtiments & Énergies</h2>
+    <a href="{% url 'batiment_list' %}" class="btn btn--secondary">
+      ← Retour à la liste
+    </a>
+  </div>
+
+  <div class="form-card">
+    <div class="form-card__header">
+      <h3>📊 Identification & Consommations</h3>
+      <p class="form-card__description">
+        Renseignez les détails du bâtiment et ses consommations annuelles.
+        Le calcul carbone sera fait automatiquement selon les facteurs ADEME.
+      </p>
+    </div>
+
+    <form method="post">
+      {% csrf_token %}
+
+      {% if form.non_field_errors %}
+      <div class="alert alert--error">
+        {{ form.non_field_errors }}
+      </div>
+      {% endif %}
+
+      <div class="grid-form">
+        <div class="section-title">📍 Identification</div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">{{ form.year.label }}</label>
+            {{ form.year }}
+          </div>
+          <div class="form-group">
+            <label class="form-label">{{ form.construction_year.label }}</label>
+            {{ form.construction_year }}
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">{{ form.site_name.label }}</label>
+          {{ form.site_name }}
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">{{ form.surface_area.label }} (m²)</label>
+          {{ form.surface_area }}
+        </div>
+
+        <div class="section-title">⚡ Énergies (kWh)</div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">💡 {{ form.electricity_kwh.label }}</label>
+            {{ form.electricity_kwh }}
+          </div>
+          <div class="form-group">
+            <label class="form-label">🔥 {{ form.gas_kwh.label }}</label>
+            {{ form.gas_kwh }}
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">♨️ {{ form.heating_network_kwh.label }}</label>
+            {{ form.heating_network_kwh }}
+          </div>
+          <div class="form-group">
+            <label class="form-label">❄️ {{ form.cooling_kwh.label }}</label>
+            {{ form.cooling_kwh }}
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">☀️ {{ form.photovoltaic_production_kwh.label }}</label>
+          {{ form.photovoltaic_production_kwh }}
+          <small style="color: #6c757d; display: block; margin-top: 5px;">Production auto-consommée ou réinjectée (à
+            titre informatif)</small>
+        </div>
+
+        <div class="section-title">📝 Notes</div>
+        <div class="form-group">
+          {{ form.notes }}
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn btn--primary btn--large">
+          💾 Enregistrer
+        </button>
+        <a href="{% url 'batiment_list' %}" class="btn btn--secondary">
+          Annuler
+        </a>
+      </div>
+    </form>
+  </div>
+
+  <!-- Info Box similar to vehicles -->
+  <div class="info-box">
+    <h4>ℹ️ Facteurs d'émission utilisés (ADEME 2024)</h4>
+    <ul style="list-style: none; padding: 0;">
+      <li>⚡ <strong>Électricité :</strong> 0.052 kgCO₂e/kWh</li>
+      <li>🔥 <strong>Gaz Naturel :</strong> 0.227 kgCO₂e/kWh</li>
+      <li>♨️ <strong>Réseau Chaleur :</strong> 0.150 kgCO₂e/kWh</li>
+      <li>❄️ <strong>Climatisation :</strong> 0.052 kgCO₂e/kWh</li>
+    </ul>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_css %}
+<style>
+  .page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #dee2e6;
+  }
+
+  .page-title {
+    color: #2d6a4f;
+    margin: 0;
+  }
+
+  .form-card {
+    background: white;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 2rem;
+  }
+
+  .form-card__header {
+    margin-bottom: 2rem;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 1rem;
+  }
+
+  .form-card__header h3 {
+    color: #2d6a4f;
+    margin-bottom: 0.5rem;
+  }
+
+  .form-card__description {
+    color: #6c757d;
+    font-size: 0.9rem;
+  }
+
+  .section-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #2d6a4f;
+    margin: 1.5rem 0 1rem 0;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #e9ecef;
+  }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+  }
+
+  .form-group {
+    margin-bottom: 1.5rem;
+  }
+
+  .form-label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: #212529;
+  }
+
+  .form-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #eee;
+  }
+
+  .btn--large {
+    padding: 0.8rem 1.5rem;
+    font-size: 1.1rem;
+  }
+
+  .info-box {
+    background: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: 6px;
+    border-left: 4px solid #2d6a4f;
+  }
+
+  .info-box h4 {
+    color: #2d6a4f;
+    margin-bottom: 0.5rem;
+  }
+
+  .info-box li {
+    margin-bottom: 0.5rem;
+    color: #495057;
+  }
+
+  @media (max-width: 768px) {
+    .form-row {
+      grid-template-columns: 1fr;
+      gap: 0;
+    }
+
+    .page-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+  }
+</style>
+{% endblock %}

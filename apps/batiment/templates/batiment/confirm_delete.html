@@ -1,0 +1,208 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Confirmation Suppression - Bilan Carbone{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="confirm-card">
+        <div class="confirm-header">
+            <div class="confirm-icon">⚠️</div>
+            <h2 class="confirm-title">Confirmer la suppression</h2>
+        </div>
+
+        <div class="confirm-content">
+            <p class="confirm-message">
+                Êtes-vous sûr de vouloir supprimer cette fiche bâtiment ?
+            </p>
+
+            <div class="data-preview">
+                <dl>
+                    <dt>Année</dt>
+                    <dd>{{ row.year }}</dd>
+
+                    <dt>Site</dt>
+                    <dd>{{ row.site_name }}</dd>
+
+                    <dt>Impact CO₂</dt>
+                    <dd class="highlight">{{ row.total_co2_kg|floatformat:2 }} kg CO₂e</dd>
+                </dl>
+            </div>
+
+            <div class="confirm-warning">
+                <strong>⚠️ Cette action est irréversible !</strong>
+                <p>Les données supprimées ne pourront pas être récupérées.</p>
+            </div>
+        </div>
+
+        <div class="confirm-actions">
+            <form method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn btn--danger">
+                    🗑️ Oui, supprimer
+                </button>
+                <a href="{% url 'batiment_list' %}" class="btn btn--secondary">
+                    Annuler
+                </a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .confirm-card {
+        max-width: 600px;
+        margin: 3rem auto;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+    }
+
+    .confirm-header {
+        background: #fff3cd;
+        border-bottom: 2px solid #ffc107;
+        padding: 2rem;
+        text-align: center;
+    }
+
+    .confirm-icon {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+    }
+
+    .confirm-title {
+        color: #2d6a4f;
+        margin: 0;
+    }
+
+    .confirm-content {
+        padding: 2rem;
+    }
+
+    .confirm-message {
+        font-size: 1.125rem;
+        color: #212529;
+        margin-bottom: 2rem;
+        text-align: center;
+    }
+
+    .data-preview {
+        background: #f8f9fa;
+        padding: 1.5rem;
+        border-radius: 6px;
+        margin-bottom: 1.5rem;
+    }
+
+    .data-preview dl {
+        display: grid;
+        grid-template-columns: 150px 1fr;
+        gap: 1rem;
+        margin: 0;
+    }
+
+    .data-preview dt {
+        font-weight: 600;
+        color: #6c757d;
+    }
+
+    .data-preview dd {
+        margin: 0;
+        color: #212529;
+    }
+
+    .data-preview .highlight {
+        color: #2d6a4f;
+        font-weight: 700;
+        font-size: 1.1rem;
+    }
+
+    .confirm-warning {
+        background: #f8d7da;
+        border: 1px solid #f5c2c7;
+        border-radius: 4px;
+        padding: 1rem;
+        color: #842029;
+    }
+
+    .confirm-warning strong {
+        display: block;
+        margin-bottom: 0.5rem;
+    }
+
+    .confirm-warning p {
+        margin: 0;
+        font-size: 0.9rem;
+    }
+
+    .confirm-actions {
+        padding: 1.5rem 2rem;
+        background: #f8f9fa;
+        border-top: 1px solid #dee2e6;
+    }
+
+    .confirm-actions form {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+    }
+
+    .btn--danger {
+        background-color: #dc3545;
+        color: white;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 1rem;
+    }
+
+    .btn--danger:hover {
+        background-color: #bb2d3b;
+    }
+
+    .btn--secondary {
+        text-decoration: none;
+        color: #6c757d;
+        padding: 0.5rem 1rem;
+        border: 1px solid #dee2e6;
+        border-radius: 4px;
+        background: white;
+    }
+
+    .btn--secondary:hover {
+        background: #e9ecef;
+    }
+
+    @media (max-width: 768px) {
+        .confirm-card {
+            margin: 2rem 1rem;
+        }
+
+        .data-preview dl {
+            grid-template-columns: 1fr;
+            gap: 0.5rem;
+        }
+
+        .data-preview dt {
+            margin-top: 1rem;
+        }
+
+        .data-preview dt:first-child {
+            margin-top: 0;
+        }
+
+        .confirm-actions form {
+            flex-direction: column;
+        }
+
+        .btn--danger,
+        .btn--secondary {
+            width: 100%;
+            text-align: center;
+        }
+    }
+</style>
+{% endblock %}

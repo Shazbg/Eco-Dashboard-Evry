@@ -15,7 +15,7 @@ def foodentry_create(request):
             entry = form.save(commit=False)
             entry.user = request.user
             entry.save()
-            return redirect("alimentation:list")
+            return redirect("food_list")
     else:
         form = FoodEntryForm(user=request.user)
 

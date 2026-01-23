@@ -112,3 +112,42 @@ def send_reminder_email(request):
         'recipients_count': recipients_count,
         'current_year': timezone.now().year
     })
+
+
+@login_required
+def dashboard_emissions_api(request):
+    """
+    API endpoint pour récupérer les données d'émissions agrégées
+    pour le graphique de répartition globale du dashboard.
+    
+    Retourne un JSON avec les émissions par secteur.
+    """
+    from django.http import JsonResponse
+    from django.db.models import Sum
+    from apps.purchases.models import PurchaseData
+    from apps.alimentation.models import FoodEntry
+    from apps.batiment.models import BuildingEnergyData
+    
+    # Agréger les données par secteur pour TOUS les utilisateurs (vue globale admin)
+    vehicles_total = VehicleData.objects.all().aggregate(total=Sum('total_co2_kg'))['total'] or 0
+    
+    purchases_total = PurchaseData.objects.all().aggregate(total=Sum('total_co2_kg'))['total'] or 0
+    
+    alimentation_total = FoodEntry.objects.all().aggregate(total=Sum('total_co2_kg'))['total'] or 0
+    
+    building_total = BuildingEnergyData.objects.all().aggregate(total=Sum('total_co2_kg'))['total'] or 0
+    
+    # Préparer les données pour Chart.js
+    data = {
+        'labels': ['Véhicules', 'Achats', 'Alimentation', 'Bâtiments'],
+        'data': [
+            round(vehicles_total, 2),
+            round(purchases_total, 2),
+            round(alimentation_total, 2),
+            round(building_total, 2)
+        ],
+        'colors': ['#4A90E2', '#9B59B6', '#27AE60', '#F39C12'],
+        'total': round(vehicles_total + purchases_total + alimentation_total + building_total, 2)
+    }
+    
+    return JsonResponse(data)

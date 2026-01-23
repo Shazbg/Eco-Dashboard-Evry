@@ -1,5 +1,15 @@
 from django.contrib import admin
-from .models import PurchaseData
+from .models import PurchaseData, PurchaseEmissionFactor
+
+
+@admin.register(PurchaseEmissionFactor)
+class PurchaseEmissionFactorAdmin(admin.ModelAdmin):
+    """
+    Interface admin pour les facteurs d'émission des achats.
+    """
+    list_display = ('category_label', 'category_code', 'factor_kg_co2_per_keur', 'source')
+    search_fields = ('category_label', 'category_code')
+    ordering = ('category_label',)
 
 
 @admin.register(PurchaseData)
@@ -31,8 +41,6 @@ class PurchaseDataAdmin(admin.ModelAdmin):
     )
     
     def description_short(self, obj):
-        """Affiche une version cour
-
-te de la description."""
+        """Affiche une version courte de la description."""
         return obj.description[:50] + '...' if len(obj.description) > 50 else obj.description
     description_short.short_description = 'Description'

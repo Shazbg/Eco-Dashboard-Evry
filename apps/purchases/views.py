@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .models import PurchaseData
+from .models import PurchaseData, PurchaseEmissionFactor
 from .forms import PurchaseDataForm
 
 
@@ -23,13 +23,18 @@ def purchase_form(request):
     else:
         form = PurchaseDataForm(initial={'year': 2026})
     
-    # Récupérer les facteurs d'émission pour affichage dynamique
-    emission_factors = PurchaseData.EMISSION_FACTORS
+    # Récupérer les facteurs d'émission depuis la base de données
+    emission_factors_qs = PurchaseEmissionFactor.objects.all().order_by('category_label')
+    emission_factors = {
+        ef.category_code: float(ef.factor_kg_co2_per_keur) 
+        for ef in emission_factors_qs
+    }
     
     return render(request, 'purchases/purchase_form.html', {
         'form': form,
         'emission_factors': emission_factors
     })
+
 
 
 @login_required

@@ -4,37 +4,58 @@ from django.utils import timezone
 from decimal import Decimal
 
 
+class PurchaseEmissionFactor(models.Model):
+    """
+    Facteur d'émission modifiable pour une catégorie d'achat.
+    Valeurs en kgCO2e par millier d'euros (kgCO2e/k€).
+    """
+    category_code = models.CharField(
+        max_length=50,
+        unique=True,
+        verbose_name="Code catégorie"
+    )
+    category_label = models.CharField(
+        max_length=200,
+        verbose_name="Libellé catégorie"
+    )
+    factor_kg_co2_per_keur = models.DecimalField(
+        max_digits=8,
+        decimal_places=2,
+        verbose_name="Facteur d'émission (kgCO2e/k€)",
+        help_text="kg CO2e par millier d'euros dépensés"
+    )
+    source = models.CharField(
+        max_length=300,
+        default="Excel Achats 30% - ADEME",
+        verbose_name="Source"
+    )
+    
+    class Meta:
+        verbose_name = "Facteur d'émission achat"
+        verbose_name_plural = "Facteurs d'émission achats"
+        ordering = ['category_label']
+    
+    def __str__(self):
+        return f"{self.category_label} ({self.factor_kg_co2_per_keur} kgCO2e/k€)"
+
+
 class PurchaseData(models.Model):
     """
     Données d'achats/marchés municipaux avec calcul de l'empreinte carbone.
-    Facteurs d'émission basés sur le fichier Excel Achats 30%.
     """
     
-    # Catégories d'achats avec facteurs d'émission (kgCO2e/k€)
+    # Catégories d'achats (pour compatibilité avec formulaire)
     CATEGORY_CHOICES = [
-        ('food_service', 'Restauration & Services légers'),  # 100
-        ('insurance', 'Assurances & Cotisations'),  # 110
-        ('it_telecom', 'IT & Téléphonie'),  # 160
-        ('cleaning_maintenance', 'Nettoyage & Entretien & Espaces verts'),  # 215
-        ('activities', 'Séjours & Activités'),  # 270
-        ('laundry', 'Blanchisserie'),  # 320
-        ('construction', 'Travaux & Construction'),  # 360
-        ('transport', 'Transports'),  # 560
-        ('equipment_rental', 'Location équipements'),  # 600
+        ('food_service', 'Restauration & Services légers'),
+        ('insurance', 'Assurances & Cotisations'),
+        ('it_telecom', 'IT & Téléphonie'),
+        ('cleaning_maintenance', 'Nettoyage & Entretien & Espaces verts'),
+        ('activities', 'Séjours & Activités'),
+        ('laundry', 'Blanchisserie'),
+        ('construction', 'Travaux & Construction'),
+        ('transport', 'Transports'),
+        ('equipment_rental', 'Location équipements'),
     ]
-    
-    # Facteurs d'émission par catégorie (source: Excel Achats 30%)
-    EMISSION_FACTORS = {
-        'food_service': Decimal('100.00'),
-        'insurance': Decimal('110.00'),
-        'it_telecom': Decimal('160.00'),
-        'cleaning_maintenance': Decimal('215.00'),
-        'activities': Decimal('270.00'),
-        'laundry': Decimal('320.00'),
-        'construction': Decimal('360.00'),
-        'transport': Decimal('560.00'),
-        'equipment_rental': Decimal('600.00'),
-    }
     
     # Métadonnées
     user = models.ForeignKey(
@@ -75,9 +96,9 @@ class PurchaseData(models.Model):
         help_text="Montant total en euros"
     )
     
-    # Facteur d'émission (automatique selon catégorie)
+    # Facteur d'émission (récupéré depuis PurchaseEmissionFactor)
     emission_factor = models.DecimalField(
-        max_digits=6,
+        max_digits=8,
         decimal_places=2,
         verbose_name="Facteur d'émission (kgCO2e/k€)",
         help_text="Facteur automatique selon la catégorie"
@@ -120,9 +141,24 @@ class PurchaseData(models.Model):
         """
         Calcul automatique du facteur d'émission et du CO₂ total.
         """
-        # Récupérer le facteur d'émission selon la catégorie
-        if self.category in self.EMISSION_FACTORS:
-            self.emission_factor = self.EMISSION_FACTORS[self.category]
+        # Récupérer le facteur d'émission depuis la base de données
+        try:
+            factor_obj = PurchaseEmissionFactor.objects.get(category_code=self.category)
+            self.emission_factor = factor_obj.factor_kg_co2_per_keur
+        except PurchaseEmissionFactor.DoesNotExist:
+            # Fallback sur valeurs par défaut si facteur non trouvé
+            default_factors = {
+                'food_service': Decimal('100.00'),
+                'insurance': Decimal('110.00'),
+                'it_telecom': Decimal('160.00'),
+                'cleaning_maintenance': Decimal('215.00'),
+                'activities': Decimal('270.00'),
+                'laundry': Decimal('320.00'),
+                'construction': Decimal('360.00'),
+                'transport': Decimal('560.00'),
+                'equipment_rental': Decimal('600.00'),
+            }
+            self.emission_factor = default_factors.get(self.category, Decimal('0.00'))
         
         # Calculer le CO₂ total : (montant / 1000) × facteur
         if self.amount_euros and self.emission_factor:

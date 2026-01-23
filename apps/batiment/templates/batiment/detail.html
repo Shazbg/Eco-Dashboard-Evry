@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+    <div style="margin-bottom: 2rem;">
+        <a href="{% url 'batiment_list' %}" class="btn btn--secondary">← Retour à la liste</a>
+    </div>
+
+    <div class="card">
+        <h2>Détail du site : {{ row.site_name }} ({{ row.year }})</h2>
+
+        <div class="grid-details">
+            <div class="detail-group">
+                <h3>Info Générale</h3>
+                <p><strong>Site :</strong> {{ row.site_name }}</p>
+                <p><strong>Année de déclaration :</strong> {{ row.year }}</p>
+                <p><strong>Surface :</strong> {{ row.surface_area }} m²</p>
+                <p><strong>Année construction :</strong> {{ row.construction_year|default:"-" }}</p>
+                <p><strong>Date d'ajout :</strong> {{ row.created_at|date:"d/m/Y H:i" }}</p>
+            </div>
+
+            <div class="detail-group">
+                <h3>Consommations & Facteurs</h3>
+                <ul>
+                    <li>
+                        <strong>Électricité :</strong> {{ row.electricity_kwh|floatformat:0 }} kWh
+                        <br><small class="text-muted">Facteur: {{ row.electricity_factor }} kgCO2e/kWh</small>
+                    </li>
+                    <li>
+                        <strong>Gaz Naturel :</strong> {{ row.gas_kwh|floatformat:0 }} kWh
+                        <br><small class="text-muted">Facteur: {{ row.gas_factor }} kgCO2e/kWh</small>
+                    </li>
+                    <li>
+                        <strong>Réseau Chaleur :</strong> {{ row.heating_network_kwh|floatformat:0 }} kWh
+                        <br><small class="text-muted">Facteur: {{ row.heating_network_factor }} kgCO2e/kWh</small>
+                    </li>
+                    <li>
+                        <strong>Climatisation :</strong> {{ row.cooling_kwh|floatformat:0 }} kWh
+                        <br><small class="text-muted">Facteur: {{ row.cooling_factor }} kgCO2e/kWh</small>
+                    </li>
+                    <li>
+                        <strong>Production PV :</strong> {{ row.photovoltaic_production_kwh|floatformat:0 }} kWh
+                    </li>
+                </ul>
+            </div>
+
+            <div class="detail-group result-group">
+                <h3>Impact Carbone Total</h3>
+                <p class="total-co2">{{ row.total_co2_kg|floatformat:2 }} <small>kg CO₂e</small></p>
+            </div>
+        </div>
+
+        {% if row.notes %}
+        <div class="notes-section">
+            <h3>Notes</h3>
+            <p>{{ row.notes|linebreaks }}</p>
+        </div>
+        {% endif %}
+
+        <div class="actions" style="margin-top: 2rem; border-top: 1px solid #eee; padding-top: 1rem;">
+            <a href="{% url 'batiment_delete' row.pk %}" class="btn btn--danger">Supprimer cette donnée</a>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        background: white;
+        padding: 2rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .grid-details {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+        margin-top: 1.5rem;
+    }
+
+    .detail-group h3 {
+        color: #2d6a4f;
+        border-bottom: 2px solid #e9ecef;
+        padding-bottom: 0.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .total-co2 {
+        font-size: 2.5rem;
+        font-weight: bold;
+        color: #2d6a4f;
+    }
+
+    .text-muted {
+        color: #6c757d;
+        font-size: 0.85rem;
+    }
+
+    .btn--secondary {
+        text-decoration: none;
+        color: #6c757d;
+    }
+
+    .btn--danger {
+        color: #dc3545;
+        text-decoration: none;
+    }
+</style>
+{% endblock %}

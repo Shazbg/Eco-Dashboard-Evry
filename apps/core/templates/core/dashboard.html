@@ -21,34 +21,32 @@
         </div>
     </div>
 
-    <div class="stats-grid">
-        <div class="stat-card">
-            <div class="stat-card__icon">📊</div>
-            <div class="stat-card__content">
-                <h3 class="stat-card__title">Progression globale</h3>
-                <p class="stat-card__value">0%</p>
-                <p class="stat-card__label">Aucune donnée saisie</p>
+    {% if user.is_staff %}
+    <!-- Section Graphique Vue d'Ensemble (Admin uniquement) -->
+    <div class="emissions-overview">
+        <h2 class="section-title">📊 Vue d'Ensemble des Émissions (Global)</h2>
+        <div class="chart-container">
+            <div class="chart-wrapper">
+                <canvas id="emissionsChart"></canvas>
+                <div id="chartLoading" class="chart-loading">
+                    <span>Chargement des données...</span>
+                </div>
+                <div id="chartError" class="chart-error" style="display: none;">
+                    <p>❌ Erreur lors du chargement des données</p>
+                </div>
             </div>
-        </div>
-
-        <div class="stat-card">
-            <div class="stat-card__icon">🚗</div>
-            <div class="stat-card__content">
-                <h3 class="stat-card__title">Véhicules</h3>
-                <p class="stat-card__value">{{ vehicle_count }}</p>
-                <p class="stat-card__label">donnée(s) saisie(s)</p>
-            </div>
-        </div>
-
-        <div class="stat-card">
-            <div class="stat-card__icon">⚡</div>
-            <div class="stat-card__content">
-                <h 3 class="stat-card__title">Facteurs ADEME</h3>
-                    <p class="stat-card__value">{{ emission_factors_count }}</p>
-                    <p class="stat-card__label">facteur(s) chargé(s)</p>
+            <div class="chart-stats">
+                <div class="chart-stat-card">
+                    <h3>Total des Émissions</h3>
+                    <p id="totalEmissions" class="chart-stat-value">-- kg CO₂e</p>
+                </div>
+                <div class="chart-legend" id="chartLegend">
+                    <!-- Legend will be populated by JavaScript -->
+                </div>
             </div>
         </div>
     </div>
+    {% endif %}
 
     <div class="modules-grid">
         <div class="module-card">
@@ -60,7 +58,7 @@
                 Saisie des consommations de carburant de la flotte municipale
             </p>
             <div class="module-card__stats">
-                <span class="module-card__badge module-card__badge--info">En cours de développement</span>
+                <span class="module-card__badge module-card__badge--info">Disponible</span>
             </div>
             <div class="module-card__actions">
                 <a href="{% url 'vehicle_form' %}" class="btn btn--primary">
@@ -72,7 +70,7 @@
             </div>
         </div>
 
-        <div class="module-card module-card--disabled">
+        <div class="module-card">
             <div class="module-card__header">
                 <span class="module-card__icon">🏢</span>
                 <h3 class="module-card__title">Bâtiments & Énergies</h3>
@@ -81,7 +79,15 @@
                 Consommations énergétiques des bâtiments municipaux
             </p>
             <div class="module-card__stats">
-                <span class="module-card__badge module-card__badge--disabled">À venir</span>
+                <span class="module-card__badge module-card__badge--info">Disponible</span>
+            </div>
+            <div class="module-card__actions">
+                <a href="{% url 'batiment_form' %}" class="btn btn--primary">
+                    📝 Saisir des données
+                </a>
+                <a href="{% url 'batiment_list' %}" class="btn btn--secondary">
+                    👁️ Voir les données
+                </a>
             </div>
         </div>
 
@@ -133,9 +139,6 @@
         <ul>
             <li><strong>Facteurs ADEME</strong> : Les calculs utilisent les facteurs officiels de la Base Carbone® ADEME
                 (vérifiés janvier 2026)</li>
-            <li><strong>Django Admin</strong> : Accédez à <a href="{% url 'admin:index' %}">l'interface
-                    d'administration</a> pour gérer les données</li>
-            <li><strong>Support Python/Django</strong> : Python 3.12.11 + Django 6.0.1</li>
         </ul>
     </div>
 </div>
@@ -340,5 +343,246 @@
     .info-section a:hover {
         text-decoration: underline;
     }
+
+    /* === Emissions Overview Chart === */
+    .emissions-overview {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    .section-title {
+        font-size: 1.5rem;
+        color: var(--primary, #2d6a4f);
+        margin-bottom: 1.5rem;
+        font-weight: 600;
+    }
+
+    .chart-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+        align-items: center;
+    }
+
+    .chart-wrapper {
+        position: relative;
+        height: 300px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .chart-loading,
+    .chart-error {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        text-align: center;
+        color: var(--text-light, #6c757d);
+        font-size: 0.875rem;
+    }
+
+    .chart-error p {
+        color: #dc3545;
+        font-weight: 500;
+    }
+
+    .chart-stats {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    .chart-stat-card {
+        background: #f8f9fa;
+        padding: 1.5rem;
+        border-radius: 8px;
+        text-align: center;
+    }
+
+    .chart-stat-card h3 {
+        font-size: 0.875rem;
+        color: var(--text-light, #6c757d);
+        margin-bottom: 0.5rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .chart-stat-value {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--primary, #2d6a4f);
+        margin: 0;
+    }
+
+    .chart-legend {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.5rem;
+        border-radius: 6px;
+        transition: background 0.2s;
+    }
+
+    .legend-item:hover {
+        background: #f8f9fa;
+    }
+
+    .legend-color {
+        width: 16px;
+        height: 16px;
+        border-radius: 3px;
+        flex-shrink: 0;
+    }
+
+    .legend-label {
+        flex: 1;
+        font-size: 0.875rem;
+        color: var(--text-dark, #212529);
+        font-weight: 500;
+    }
+
+    .legend-value {
+        font-size: 0.875rem;
+        color: var(--text-light, #6c757d);
+    }
+
+    .legend-percentage {
+        font-size: 0.75rem;
+        color: var(--text-light, #6c757d);
+        margin-left: 0.25rem;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .chart-container {
+            grid-template-columns: 1fr;
+        }
+
+        .chart-wrapper {
+            height: 250px;
+        }
+    }
 </style>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+    // Function to load and display emissions chart
+    async function loadEmissionsChart() {
+        const chartCanvas = document.getElementById('emissionsChart');
+        const chartLoading = document.getElementById('chartLoading');
+        const chartError = document.getElementById('chartError');
+        const totalEmissionsEl = document.getElementById('totalEmissions');
+        const legendEl = document.getElementById('chartLegend');
+
+        try {
+            // Fetch data from API
+            const response = await fetch('{% url "dashboard_emissions_api" %}');
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+
+            const data = await response.json();
+
+            // Hide loading indicator
+            chartLoading.style.display = 'none';
+
+            // Check if we have any data
+            const hasData = data.data.some(value => parseFloat(value) > 0);
+
+            if (!hasData) {
+                chartError.innerHTML = '<p>📊 Aucune donnée d\'émission disponible.<br>Commencez par saisir des données dans les modules.</p>';
+                chartError.style.display = 'block';
+                totalEmissionsEl.textContent = '0 kg CO₂e';
+                return;
+            }
+
+            // Update total emissions
+            totalEmissionsEl.textContent = `${parseFloat(data.total).toLocaleString('fr-FR')} kg CO₂e`;
+
+            // Create custom legend
+            legendEl.innerHTML = data.labels.map((label, index) => {
+                const value = parseFloat(data.data[index]);
+                const percentage = ((value / parseFloat(data.total)) * 100).toFixed(1);
+                return `
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: ${data.colors[index]}"></div>
+                        <span class="legend-label">${label}</span>
+                        <span class="legend-value">
+                            ${value.toLocaleString('fr-FR')} kg
+                            <span class="legend-percentage">(${percentage}%)</span>
+                        </span>
+                    </div>
+                `;
+            }).join('');
+
+            // Initialize Chart.js donut chart
+            new Chart(chartCanvas, {
+                type: 'doughnut',
+                data: {
+                    labels: data.labels,
+                    datasets: [{
+                        data: data.data.map(v => parseFloat(v)),
+                        backgroundColor: data.colors,
+                        borderWidth: 0,
+                        hoverOffset: 10,
+                        hoverBorderWidth: 2,
+                        hoverBorderColor: '#fff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            display: false  // Use custom legend instead
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            padding: 12,
+                            cornerRadius: 6,
+                            titleFont: { size: 14, weight: '600' },
+                            bodyFont: { size: 13 },
+                            callbacks: {
+                                label: (context) => {
+                                    const value = context.parsed;
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = ((value / total) * 100).toFixed(1);
+                                    return `${value.toLocaleString('fr-FR')} kg CO₂e (${percentage}%)`;
+                                }
+                            }
+                        }
+                    },
+                    animation: {
+                        animateRotate: true,
+                        animateScale: false,
+                        duration: 1000,
+                        easing: 'easeOutQuart'
+                    },
+                    cutout: '65%'  // Makes it a donut instead of pie
+                }
+            });
+
+        } catch (error) {
+            console.error('Error loading emissions chart:', error);
+            chartLoading.style.display = 'none';
+            chartError.style.display = 'block';
+        }
+    }
+
+    // Load chart when page is ready
+    document.addEventListener('DOMContentLoaded', loadEmissionsChart);
+</script>
 {% endblock %}

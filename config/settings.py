@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'apps.vehicles',
     'apps.purchases',
     'apps.alimentation',
+    'apps.batiment',
 ]
 
 MIDDLEWARE = [
