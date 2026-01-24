@@ -55,14 +55,14 @@
                     <td class="data-cell data-cell--bold">{{ entry.year }}</td>
                     <td class="data-cell">{{ entry.service|default:"—" }}</td>
                     <td class="data-cell">
-                        {% if entry.beef_meals %}<span class="badge badge--fuel">🥩 Bœuf: {{ entry.beef_meals
-                            }}</span><br>{% endif %}
-                        {% if entry.pork_meals %}<span class="badge badge--fuel">🐷 Porc: {{ entry.pork_meals
-                            }}</span><br>{% endif %}
-                        {% if entry.poultry_fish_meals %}<span class="badge badge--distance">🐔 Volaille: {{
-                            entry.poultry_fish_meals }}</span><br>{% endif %}
-                        {% if entry.vegetarian_meals %}<span class="badge badge--distance">🥗 Végétarien: {{
-                            entry.vegetarian_meals }}</span>{% endif %}
+                        {% if entry.beef_meals %}<span class="badge badge--fuel">🥩 Bœuf:
+                            {{ entry.beef_meals}}</span><br>{% endif %}
+                        {% if entry.pork_meals %}<span class="badge badge--fuel">🐷 Porc:
+                            {{ entry.pork_meals }}</span><br>{% endif %}
+                        {% if entry.poultry_fish_meals %}<span class="badge badge--distance">🐔 Volaille:
+                            {{ entry.poultry_fish_meals }}</span><br>{% endif %}
+                        {% if entry.vegetarian_meals %}<span class="badge badge--distance">🥗 Végétarien:
+                            {{ entry.vegetarian_meals }}</span>{% endif %}
                     </td>
                     <td class="data-cell">
                         {{ entry.total_meals }}

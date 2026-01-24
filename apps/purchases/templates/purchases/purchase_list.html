@@ -32,8 +32,8 @@
         <div class="total-card__content">
             <h3 class="total-card__label">Impact carbone total</h3>
             <p class="total-card__value">{{ total_co2|floatformat:2 }} kg CO₂e</p>
-            <p class="total-card__subtext">≈ {% widthratio total_co2 1000 1 %} tonne(s) CO₂e | Montant total: {{
-                total_amount|floatformat:2 }} €</p>
+            <p class="total-card__subtext">≈ {% widthratio total_co2 1000 1 %} tonne(s) CO₂e | Montant total:
+                {{ total_amount|floatformat:2 }} €</p>
         </div>
     </div>
 
