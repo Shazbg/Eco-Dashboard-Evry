@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Tableau de bord - Bilan Carbone{% endblock %}
+{% block title %}Tableau de bord - Bilan Carbone {% now "Y" %} {% endblock %}
 
 {% block content %}
 <div class="container">
@@ -24,7 +24,7 @@
     {% if user.is_staff %}
     <!-- Section Graphique Vue d'Ensemble (Admin uniquement) -->
     <div class="emissions-overview">
-        <h2 class="section-title">📊 Vue d'Ensemble des Émissions (Global)</h2>
+        <h2 class="section-title">📊 Vue d'Ensemble des Émissions {% now "Y" %} (Global)</h2>
         <div class="chart-container">
             <div class="chart-wrapper">
                 <canvas id="emissionsChart"></canvas>
